@@ -1,4 +1,4 @@
-#![feature(lang_items, const_fn, panic_implementation)]
+#![feature(start, lang_items, const_fn, panic_implementation)]
 #![no_std]
 #![allow(non_camel_case_types)]
 #![allow(non_upper_case_globals)]
@@ -8,11 +8,10 @@
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
 #[no_mangle]
-pub unsafe extern "C" fn rust_main() {
+#[start]
+pub unsafe extern fn main(_argc : isize, _argv : * const * const u8) ->isize {
     printf("\x1b[16;16HPress PLUS to exit.".as_ptr() as *const i8);
 
-    // I'm not sure why but if I don't call consoleInit() from C
-    // the <switch.h> library is not linked properly ¯\_(ツ)_/¯
     gfxInitDefault();
     consoleInit(_NULL as *mut PrintConsole);
     while appletMainLoop() {
@@ -31,6 +30,7 @@ pub unsafe extern "C" fn rust_main() {
         gfxWaitForVsync();
     }
 	gfxExit();
+    0
 }
 
 pub mod lang_items;
